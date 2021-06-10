@@ -1,0 +1,219 @@
+<template>
+  <div>
+    <img class="page-bg" src="/images/matetmat_bnr.jpg" alt="" />
+    <div class="backdrop"></div>
+    <div class="main-container">
+        <div v-if="are_admin" class="content">
+            <div>
+                <svg v-if="!show_add_form" @click="show_add_form=true" style="width:24px;height:24px;cursor:pointer" viewBox="0 0 24 24">
+                    <path fill="#7957d5" d="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M13,7H11V11H7V13H11V17H13V13H17V11H13V7Z" />
+                </svg>
+                <svg v-else @click="show_add_form=false" style="width:24px;height:24px;cursor:pointer" viewBox="0 0 24 24">
+                    <path fill="red" d="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2M14.59,8L12,10.59L9.41,8L8,9.41L10.59,12L8,14.59L9.41,16L12,13.41L14.59,16L16,14.59L13.41,12L16,9.41L14.59,8Z" />
+                </svg>
+                <div v-if="show_add_form">
+                    <b-field label="Курс">
+                    <b-select v-model="stage" placeholder="Виберіть курс">
+                        <option
+                            v-for="i in 3"
+                            :value="i+1"
+                            :key="i">
+                            {{ i+1 }}
+                        </option>
+                    </b-select>
+                    </b-field>
+                    <b-field label="Семестр">
+                        <b-select v-model="cemester" placeholder="Виберіть семестр">
+                            <option
+                                v-for="i in 2"
+                                :value="i"
+                                :key="i">
+                                {{ i }}
+                            </option>
+                        </b-select>
+                    </b-field>
+                    <b-field label="Кількість дисциплін для вибору">
+                        <b-numberinput min="2"  v-model="number"></b-numberinput>
+                    </b-field>
+                    <div style="margin-bottom:10px" v-for="(el,i) in disciplines_for_add" :key="i">
+                        <b-field :label="`Дисципліна ${i+1}`">
+                            <b-input v-model="disciplines_for_add[i].title"></b-input>
+                        </b-field>
+                        <b-field  :label="`Посилання на документ з описом дисципліни ${i+1}`">
+                            <b-input v-model="disciplines_for_add[i].link_to_file"></b-input>
+                        </b-field>
+                    </div>
+                    <b-button
+                        @click="create()"
+                        type="is-primary"
+                        :disabled="!canCreate"
+                        rounded
+                        expanded
+                        >Додати
+                    </b-button>
+                </div>
+                <div class="disciplines-container">
+                    <div v-for="(el,key) in data" :key="key">
+                        <div style="font-weight:bold">Вибіркові навчальні дисципліни для здобувачів {{key}} курсу</div>
+                        <div class="discipline" v-for="(cemester,index) in el" :key="index">
+                           <div>
+                               {{cemester.cemester}} семестр, дисципліна на вибір {{index+1}}
+                                <div v-for="(discipline,i) in cemester.disciplines" :key="i">
+                                    <div>{{i+1}} {{discipline.title}} <a>{{discipline.link_to_file}}</a></div>
+                                </div>
+                           </div>
+                             <svg  @click="deleteItem(cemester.id)" style="width:24px;height:24px;cursor:pointer" viewBox="0 0 24 24">
+                                <path fill="red" d="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2M14.59,8L12,10.59L9.41,8L8,9.41L10.59,12L8,14.59L9.41,16L12,13.41L14.59,16L16,14.59L13.41,12L16,9.41L14.59,8Z" />
+                            </svg>
+                        </div>
+                    </div>
+                   
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+  </div>
+</template>
+<script>
+import firebase from 'firebase';
+export default {
+    data() {
+        return {
+            are_admin:false,
+            show_add_form:false,
+            stage:null,
+            cemester:null,
+            number:2,
+            disciplines_for_add:[
+                {
+                    title:'',
+                    link_to_file:''
+                },
+                {
+                    title:'',
+                    link_to_file:''
+                }
+            ],
+            data:null
+        }
+    },
+    watch:{
+        number(newVal,oldVal){
+            if(oldVal<newVal){
+                this.disciplines_for_add.push({
+                    title:'',
+                    link_to_file:''
+                })
+            }else{
+                this.disciplines_for_add.pop();
+            }
+        }
+    },
+    computed:{
+        canCreate(){
+            if(this.stage && 
+            this.cemester && 
+            this.disciplines_for_add[0].title && 
+            this.disciplines_for_add[0].link_to_file && 
+            this.disciplines_for_add[1].title && 
+            this.disciplines_for_add[1].link_to_file){
+                return true;
+            }
+            else{
+                return false
+            }
+        },
+        
+    },
+    created(){
+        this.getData();
+        let pass = prompt('Пароль від адмін панелі:', );
+        if(pass!='admin'){
+            window.location.reload();
+        }else{
+            setTimeout(()=>this.are_admin = true,1000)
+        }
+        
+    },
+    methods:{
+        deleteItem(id){
+            firebase.database().ref('disciplines').child(id).remove();
+            this.getData();
+        },
+        dataSorted(){
+            let newData={'2':[],'3':[],'4':[]};
+            for (const key in this.data) {
+                if (Object.hasOwnProperty.call(this.data, key)) {
+                    const el = this.data[key];
+                    el.id = key;
+                    newData[el.stage].push(el);
+                }
+            }
+            this.data = newData;
+            for (const key in this.data) {
+                if (Object.hasOwnProperty.call(this.data, key)) {
+                    const el = this.data[key];
+                    el.sort(function(a,b){
+                        if(a.cemester<b.cemester) return -1;
+                        if(a.cemester>b.cemester) return 1;
+                        return 0;
+                    })
+                    this.data[key] = el;
+                }
+            }
+        },
+        getData(){
+            var starCountRef = firebase.database().ref('disciplines/');
+            starCountRef.on('value', (snapshot) => {
+                this.data = snapshot.val();
+                this.dataSorted();
+            });
+            
+        },
+        create(){
+            let database = firebase.database();
+            database.ref('disciplines/'+Date.now()).set({
+                stage:this.stage,
+                cemester:this.cemester,
+                disciplines:this.disciplines_for_add
+            })
+            this.getData();
+            this.show_add_form=false;
+        }
+    }
+};
+</script>
+<style scoped>
+.content{
+  background: #f2f2f2d5;
+  width: 60%;
+  padding: 10vh 4vh;
+  overflow: scroll;
+}
+.add-icon{
+    width:20px;
+    height:20px;
+}
+.discipline{
+    display: flex;
+    justify-content: center;
+}
+.discipline svg{
+    margin-left: 10px;
+}
+@media screen and (max-width: 1024px) {
+  .content {
+
+    padding: 8vh 3vh;
+    width: 80%;
+  }
+}
+@media screen and (max-width: 481px) {
+  .content {
+    padding: 6vh 2vh;
+    width: 100%;
+  }
+}
+</style>
