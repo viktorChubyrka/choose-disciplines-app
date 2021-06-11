@@ -123,7 +123,7 @@
 <script>
 import DocumentCreator from "@/components/DocumentCreator.vue"
 
-import firebase from 'firebase';
+import firebase from 'firebase/app';
 export default {
     components:{DocumentCreator},
     data() {

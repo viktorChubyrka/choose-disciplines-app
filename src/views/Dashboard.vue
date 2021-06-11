@@ -64,7 +64,7 @@
          
         </div>
     </div>
-    <Navbar />
+    <Navbar :name="userData.data.displayName" />
     
   </div>
 </template>
@@ -72,7 +72,7 @@
 import Navbar from "@/components/Navbar.vue";
 
 
-import firebase from 'firebase';
+import firebase from 'firebase/app';
 
 export default {
   components: {

@@ -9,7 +9,7 @@ import "buefy/dist/buefy.css";
 Vue.use(Buefy);
 
 //Firebase connection
-import firebase from "firebase";
+import firebase from "firebase/app";
 
 var firebaseConfig = {
   apiKey: "AIzaSyAdI6mhlQShqQP5SRFVg8PHrO6ApAeXbwE",

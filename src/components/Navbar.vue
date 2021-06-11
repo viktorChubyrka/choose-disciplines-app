@@ -1,5 +1,6 @@
 <template>
     <div class="navigation">
+      {{name}}
         <b-button 
             @click="logOut()"
             type="is-primary"
@@ -15,6 +16,11 @@ export default {
     return {
       
     };
+  },
+  props:{
+    name:{
+      type:String
+    }
   },
   methods: {
     logOut() {
@@ -37,7 +43,7 @@ export default {
     height:10vh;
     display:flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     padding:0 10px;
 }
 @media screen and (max-width: 1024px) {
