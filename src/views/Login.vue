@@ -101,7 +101,7 @@ export default {
       const provider = new firebase.auth.GoogleAuthProvider();
       firebase.auth().signInWithPopup(provider).then(result=>{
         console.log(result);
-      }).catch(er=> {alert('Oops');console.log(er);})
+      }).catch(er=> {console.log(er);})
     },
     logIn() {
       firebase
