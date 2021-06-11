@@ -1,11 +1,11 @@
 <template>
     <div>
-        <b-button style="margin:20px 0px 0px;"
+        <b-button 
             @click="generateWordDocument()"
             type="is-primary"
             rounded
             expanded
-            >Підтвердити вибір
+            >Скачати документ
         </b-button>
     </div>
 </template>
@@ -22,6 +22,18 @@ export default {
         },
         selected_disciplines:{
             type:Array
+        },
+        name:{
+            type:String,
+        },
+        dekan:{
+            type:String,
+        },
+        faculty_name:{
+            type:String,
+        },
+        full_OP_name:{
+            type:String,
         }
     },
     data:()=>{
@@ -47,19 +59,6 @@ export default {
                             ],
                         }),
                         new docx.Paragraph({
-                           
-                            children: [
-                                new docx.TextRun({
-                                    text: "\t\t\t\t\t\tматематичного",
-                                    font:'Times New Roman',
-                                    size:28,
-
-                                }),
-                                
-                            ],
-                        }),
-                        new docx.Paragraph({
-                           
                             children: [
                                 new docx.TextRun({
                                     text: "\t\t\t\t\t\tфакультету",
@@ -74,7 +73,7 @@ export default {
                            
                             children: [
                                 new docx.TextRun({
-                                    text: "\t\t\t\t\t\t_______________________________",
+                                    text: `\t\t\t\t\t\t${this.dekan}`,
                                     font:'Times New Roman',
                                     size:28,
 
@@ -82,21 +81,21 @@ export default {
                                 
                             ],
                         }),
-                        new docx.Paragraph({
-                            children: [
-                                new docx.TextRun({
-                                    text: "\t\t\t\t\t\t\t\t(прізвище, ініціали)",
-                                    font:'Times New Roman',
-                                    size:16,
+                        // new docx.Paragraph({
+                        //     children: [
+                        //         new docx.TextRun({
+                        //             text: "\t\t\t\t\t\t\t\t(прізвище, ініціали)",
+                        //             font:'Times New Roman',
+                        //             size:16,
 
-                                }),
+                        //         }),
                                 
-                            ],
-                        }),
+                        //     ],
+                        // }),
                         new docx.Paragraph({
                             children: [
                                 new docx.TextRun({
-                                    text: `\t\t\t\t\t\tстудента ${this.stage} курсу`,
+                                    text: `\t\t\t\t\t\tвід студента ${this.stage} курсу`,
                                     font:'Times New Roman',
                                     size:28,
 
@@ -107,7 +106,7 @@ export default {
                          new docx.Paragraph({
                             children: [
                                 new docx.TextRun({
-                                    text: "\t\t\t\t\t\tспеціальності Системний аналіз",
+                                    text: "\t\t\t\t\t\tспеціальності ________________",
                                     font:'Times New Roman',
                                     size:28,
 
@@ -131,7 +130,7 @@ export default {
                            
                             children: [
                                 new docx.TextRun({
-                                    text: "\t\t\t\t\t\tосвітня програма 124 Системний",
+                                    text: "\t\t\t\t\t\tосвітня програма ",
                                     font:'Times New Roman',
                                     size:28,
 
@@ -142,7 +141,7 @@ export default {
                         new docx.Paragraph({
                             children: [
                                 new docx.TextRun({
-                                    text: "\t\t\t\t\t\tаналіз",
+                                    text: `\t\t\t\t\t\t ${this.full_OP_name}`,
                                     font:'Times New Roman',
                                     size:28,
 
@@ -154,7 +153,7 @@ export default {
                            
                             children: [
                                 new docx.TextRun({
-                                    text: "\t\t\t\t\t\t_______________________________",
+                                    text: `\t\t\t\t\t\t${this.name}`,
                                     font:'Times New Roman',
                                     size:28,
 
@@ -162,16 +161,16 @@ export default {
                                 
                             ],
                         }),
-                        new docx.Paragraph({
-                            children: [
-                                new docx.TextRun({
-                                    text: "\t\t\t\t\t\t\t\t(прізвище, ініціали)",
-                                    font:'Times New Roman',
-                                    size:16,
-                                }),
+                        // new docx.Paragraph({
+                        //     children: [
+                        //         new docx.TextRun({
+                        //             text: "\t\t\t\t\t\t\t\t(прізвище, ініціали)",
+                        //             font:'Times New Roman',
+                        //             size:16,
+                        //         }),
                                 
-                            ],
-                        }),
+                        //     ],
+                        // }),
                         new docx.Paragraph({
                             alignment:'center',
                             spacing: {
@@ -211,7 +210,7 @@ export default {
                                         after: 500,
                                         before:500
                                     },
-                                    text: "\tДата 			________________ (Прізвище, ініціали)",
+                                    text: "\tДата 			________________ ",
                                     font:'Times New Roman',
                                     size:28,
 
@@ -250,7 +249,7 @@ export default {
                         new docx.Paragraph({
                             children: [
                                 new docx.TextRun({
-                                    text: "\tКуратор  ______________________________ (Прізвище, ініціали):",
+                                    text: "\tКуратор  ______________________________:",
                                     font:'Times New Roman',
                                     size:28,
 
@@ -275,7 +274,7 @@ export default {
                         new docx.Paragraph({
                             children: [
                                 new docx.TextRun({
-                                    text: "\tКуратор  ______________________________ (Прізвище, ініціали):",
+                                    text: `\tДекан факультету  ______________________________:${this.dekan}`,
                                     font:'Times New Roman',
                                     size:28,
 

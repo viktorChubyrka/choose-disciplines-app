@@ -4,6 +4,18 @@
     <div class="backdrop"></div>
     <div class="main-container">
       <div class="login-form">
+         <h1 style="margin-bottom:20px;font-size:30px">На сайт ви можете увійти задопомогою акаунту Google просто натиснувши кнопку!</h1>
+          <b-button
+              @click="logGoog()"
+                type="is-primary"
+                rounded
+                expanded
+                >Увійти</b-button
+              >
+      </div>
+     
+      
+      <!-- <div class="login-form">
         <section>
           <b-field
             label="Email"
@@ -35,11 +47,12 @@
         <h3 class="registration-link">
           Зареєструйся <a href="/register">тут</a>
         </h3>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
 <script>
+
 import firebase from "firebase";
 export default {
   data() {
@@ -84,6 +97,12 @@ export default {
     },
   },
   methods: {
+    logGoog(){
+      const provider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth().signInWithPopup(provider).then(result=>{
+        console.log(result);
+      }).catch(er=> alert('Oops'))
+    },
     logIn() {
       firebase
         .auth()

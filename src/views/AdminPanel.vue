@@ -4,7 +4,38 @@
     <div class="backdrop"></div>
     <div class="main-container">
         <div v-if="are_admin" class="content">
-            <div>
+            <div class="tabs-container">
+                    <h4 @click="tab=1" :class="tab==1?'active':''">Налаштування освітньої програми</h4>
+                    <h4 @click="tab=2" :class="tab==2?'active':''">Списки заповнених заяв</h4>
+                </div>
+            <div v-if="tab==1" >
+              <div>
+                
+                <div class="input-row">
+                    <b-field style="width:90%" :label="`Повна назва дисципліни`">
+                        <b-input  expanded v-model="full_OP_name"></b-input>
+                    </b-field>
+                     <svg @click="saveFullOPName()" style="width:40px;height:40px" viewBox="0 0 24 24">
+                        <path fill="green" d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z" />
+                    </svg>
+                </div>
+                 <div class="input-row">
+                    <b-field style="width:90%" :label="`Назва факультету`">
+                        <b-input  expanded v-model="faculty_name"></b-input>
+                    </b-field>
+                     <svg @click="saveFacultyName()" style="width:40px;height:40px" viewBox="0 0 24 24">
+                        <path fill="green" d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z" />
+                    </svg>
+                </div>
+                 <div class="input-row">
+                    <b-field style="width:90%" :label="`Прізвище ініціали декана факультуту`">
+                        <b-input  expanded v-model="dekan"></b-input>
+                    </b-field>
+                     <svg @click="saveDekan()" style="width:40px;height:40px" viewBox="0 0 24 24">
+                        <path fill="green" d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z" />
+                    </svg>
+                </div>
+            </div>
                 <svg v-if="!show_add_form" @click="show_add_form=true" style="width:24px;height:24px;cursor:pointer" viewBox="0 0 24 24">
                     <path fill="#7957d5" d="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M13,7H11V11H7V13H11V17H13V13H17V11H13V7Z" />
                 </svg>
@@ -70,20 +101,41 @@
                    
                 </div>
             </div>
-
+            <div v-else>
+                <div style="width:100%;padding:10px;box-sizing:border-box; display:flex;align-items:center;justify-content:space-between" v-for="(el,key) in declares" :key="key">
+                    {{el.user}}
+                    <div>
+                        <div v-for="discipline in el.selected_disciplines" :key="discipline">{{discipline}}</div>
+                    </div>
+                    <DocumentCreator 
+                    :stage="el.stage" 
+                    :selected_disciplines="el.selected_disciplines" 
+                    :name="el.user" 
+                    :dekan="dekan"
+                    :faculty_name="faculty_name"
+                    :full_OP_name="full_OP_name"/></div>
+            </div>
         </div>
     </div>
 
   </div>
 </template>
 <script>
+import DocumentCreator from "@/components/DocumentCreator.vue"
+
 import firebase from 'firebase';
 export default {
+    components:{DocumentCreator},
     data() {
         return {
+            declares:null,
+            settings:true,
             are_admin:false,
             show_add_form:false,
             stage:null,
+            dekan:null,
+            full_OP_name:null,
+            faculty_name:null,
             cemester:null,
             number:2,
             disciplines_for_add:[
@@ -96,7 +148,9 @@ export default {
                     link_to_file:''
                 }
             ],
-            data:null
+            data:null,
+            OP:'',
+            tab:1
         }
     },
     watch:{
@@ -128,18 +182,39 @@ export default {
         
     },
     created(){
-        this.getData();
-        let pass = prompt('Пароль від адмін панелі:', );
-        if(pass!='admin'){
-            window.location.reload();
-        }else{
-            setTimeout(()=>this.are_admin = true,1000)
+        this.OP = prompt('Номер освітньої програми:', );
+        if(this.OP){
+            var starCountRef = firebase.database().ref(`choose-app/${this.OP}/`);
+            starCountRef.on('value', (snapshot) => {
+                if (snapshot.exists()){
+                    let pass = prompt(`Пароль від адмін панелі освітньої програми ${this.OP}:`, );
+                    if(pass===snapshot.val().password){
+                        setTimeout(()=>this.are_admin = true,1000);
+                        this.getData();
+                    }else{
+                        window.location.reload();
+                    }
+                    
+                }else{
+                    let createNewOP = confirm(`Освітньої програми номер ${this.OP} не існує! \n Бажаєте творити її?`);
+                    if(createNewOP){
+                        let password = prompt(`Придумайте пароль від адмін панелі освітньої програми ${this.OP}:`, );
+                        let database = firebase.database();
+                        database.ref(`choose-app/${this.OP}`).set({
+                            password
+                        })
+                         this.getData();
+                         this.show_add_form=false;
+                    }else{
+                        window.location.reload();
+                    }
+                }
+            });
         }
-        
     },
     methods:{
         deleteItem(id){
-            firebase.database().ref('disciplines').child(id).remove();
+            firebase.database().ref(`choose-app/${this.OP}/disciplines`).child(id).remove();
             this.getData();
         },
         dataSorted(){
@@ -165,22 +240,47 @@ export default {
             }
         },
         getData(){
-            var starCountRef = firebase.database().ref('disciplines/');
+            var starCountRef = firebase.database().ref(`choose-app/${this.OP}/`);
             starCountRef.on('value', (snapshot) => {
-                this.data = snapshot.val();
+                this.data = snapshot.val().disciplines;
+                this.faculty_name = snapshot.val().faculty_name;
+                this.dekan = snapshot.val().dekan;
+                this.full_OP_name = snapshot.val().full_OP_name;
+                this.declares = snapshot.val().declare;
                 this.dataSorted();
             });
             
         },
         create(){
             let database = firebase.database();
-            database.ref('disciplines/'+Date.now()).set({
+            database.ref(`choose-app/${this.OP}/disciplines/`+Date.now()).set({
                 stage:this.stage,
                 cemester:this.cemester,
                 disciplines:this.disciplines_for_add
             })
             this.getData();
             this.show_add_form=false;
+        },
+        saveFullOPName(){
+            let database = firebase.database();
+            database.ref(`choose-app/${this.OP}/full_OP_name`).set(
+               this.full_OP_name
+            )
+            this.getData();
+        },
+        saveFacultyName(){
+            let database = firebase.database();
+            database.ref(`choose-app/${this.OP}/faculty_name`).set(
+               this.faculty_name
+            )
+            this.getData();
+        },
+        saveDekan(){
+            let database = firebase.database();
+            database.ref(`choose-app/${this.OP}/dekan`).set(
+                this.dekan
+            )
+            this.getData();
         }
     }
 };
@@ -191,6 +291,13 @@ export default {
   width: 60%;
   padding: 10vh 4vh;
   overflow: scroll;
+}
+.content::-webkit-scrollbar{
+    width:0;
+    height:0;
+}
+svg{
+    cursor: pointer;
 }
 .add-icon{
     width:20px;
@@ -203,9 +310,32 @@ export default {
 .discipline svg{
     margin-left: 10px;
 }
+.input-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.tabs-container{
+    width:100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.tabs-container h4{
+    margin:0!important;
+    padding:10px;
+    color:grey;
+    cursor:pointer;
+}
+.tabs-container h4.active{
+    color:#7957d5;
+}
+.tabs-container h4:hover{
+    color:#7957d5;
+}
 @media screen and (max-width: 1024px) {
   .content {
-
     padding: 8vh 3vh;
     width: 80%;
   }
