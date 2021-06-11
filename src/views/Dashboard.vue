@@ -10,7 +10,7 @@
               v-for="(el,key) in this.all_data"
               :value="key"
               :key="key">
-              {{ key }}
+              {{ el.full_OP_name }}
             </option>
           </b-select>
           <b-select v-if="selected_OP" v-model="stage" placeholder="Виберіть курс">
