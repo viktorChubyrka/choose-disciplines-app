@@ -7,7 +7,8 @@
             <div class="tabs-container">
                     <h4 @click="tab=1" :class="tab==1?'active':''">Налаштування освітньої програми</h4>
                     <h4 @click="tab=2" :class="tab==2?'active':''">Списки заповнених заяв</h4>
-                </div>
+                    <h4 @click="DeleteOP()">Видалити ОП</h4>
+            </div>
             <div v-if="tab==1" >
               <div>
                 
@@ -102,18 +103,52 @@
                 </div>
             </div>
             <div v-else>
-                <div style="width:100%;padding:10px;box-sizing:border-box; display:flex;align-items:center;justify-content:space-between" v-for="(el,key) in declares" :key="key">
+                <div class="tabs-container">
+                    <h6 @click="sub_tab=1" :class="sub_tab==1?'active':''">Заяви студентів</h6>
+                    <h6 @click="sub_tab=2" :class="sub_tab==2?'active':''">Списки дисциплін</h6>
+                    <h6 @click="deleteAllDeclares()" >Видалити всі заяви</h6>
+
+                </div>
+                <div v-if="sub_tab==1">
+                    <div v-for="(elem,key) in sortedDeclares" :key="elem.id">
+                        <h3>{{key}} Курс</h3>
+                            <div  style="width:100%;
+                            padding:10px;
+                            box-sizing:border-box;
+                             display:flex;
+                             align-items:center;
+                             justify-content:space-between" v-for="(el,key) in elem" :key="key">
                     {{el.user}}
                     <div>
-                        <div v-for="discipline in el.selected_disciplines" :key="discipline">{{discipline}}</div>
+                        <!-- <div v-for="discipline in el.selected_disciplines" :key="discipline">{{discipline}}</div> -->
+
                     </div>
-                    <DocumentCreator 
-                    :stage="el.stage" 
-                    :selected_disciplines="el.selected_disciplines" 
-                    :name="el.user" 
-                    :dekan="dekan"
-                    :faculty_name="faculty_name"
-                    :full_OP_name="full_OP_name"/></div>
+                    <div style="display:flex">
+                        <b-button style="width:min-content;margin-right:10px"
+                            @click="deleteDocument(key124)"
+                            type="is-danger"
+                            rounded
+                            expanded
+                            >Видалити
+                        </b-button>
+                        <DocumentCreator 
+                        :stage="el.stage" 
+                        :selected_disciplines="el.selected_disciplines" 
+                        :name="el.user" 
+                        :dekan="dekan"
+                        :faculty_name="faculty_name"
+                        :full_OP_name="full_OP_name"/>
+                    </div>
+                    </div>
+                    </div>
+                   
+                </div>
+                <div v-else>
+                        <div v-for="(el,key) in disciplinesList" :key="key">
+                            <h3>{{key}} Курс</h3>
+                            <div style="display:flex;align-items:center" v-for="element in el" :key="element.dis"><h4>{{element.dis}}:</h4>  <h5>вибрало - {{element.counter}}</h5></div>
+                        </div>
+                </div>
             </div>
         </div>
     </div>
@@ -150,7 +185,8 @@ export default {
             ],
             data:null,
             OP:'',
-            tab:1
+            tab:1,
+            sub_tab:1
         }
     },
     watch:{
@@ -166,6 +202,17 @@ export default {
         }
     },
     computed:{
+        sortedDeclares(){
+            let array = {'2':[],'3':[],'4':[]};
+            for (const key in this.declares) {
+                if (Object.hasOwnProperty.call(this.declares, key)) {
+                    let el = this.declares[key];
+                    el.id = key;
+                    array[el.stage].push(el);
+                }
+            }
+            return array
+        },
         canCreate(){
             if(this.stage && 
             this.cemester && 
@@ -179,6 +226,41 @@ export default {
                 return false
             }
         },
+        disciplinesList(){
+            let disc_obj = {'2':[],'3':[],'4':[]};
+            for (const key in this.declares) {
+                if (Object.hasOwnProperty.call(this.declares, key)) {
+                    disc_obj[this.declares[key].stage]=[...disc_obj[this.declares[key].stage],...this.declares[key].selected_disciplines];
+                }
+            }
+            let sorted_disc_obj = {'2':[],'3':[],'4':[]};
+             for (const key in disc_obj) {
+                if (Object.hasOwnProperty.call(disc_obj, key)) {
+                    sorted_disc_obj[key]=new Set(disc_obj[key]);
+                }
+            }
+            let obj={'2':[],'3':[],'4':[]};
+            for (const key in sorted_disc_obj) {
+                if (Object.hasOwnProperty.call(sorted_disc_obj, key)) {
+                    sorted_disc_obj[key].forEach(el => {
+                        obj[key].push({dis:el,counter:0})
+                    });
+                }
+            }
+             for (const key in obj) {
+                if (Object.hasOwnProperty.call(obj, key)) {
+                    obj[key].forEach(el => {
+                        for (let i = 0; i < disc_obj[key].length; i++) {
+                            if(el.dis==disc_obj[key][i])
+                            {
+                                el.counter+=1;
+                            }
+                        }
+                    });
+                }
+            }
+            return obj;
+        }
         
     },
     created(){
@@ -203,8 +285,9 @@ export default {
                         database.ref(`choose-app/${this.OP}`).set({
                             password
                         })
-                         this.getData();
-                         this.show_add_form=false;
+                        setTimeout(()=>this.are_admin = true,1000);
+                        this.getData();
+                        this.show_add_form=false;
                     }else{
                         window.location.reload();
                     }
@@ -213,6 +296,24 @@ export default {
         }
     },
     methods:{
+        deleteAllDeclares(){
+            let deleteOP = confirm(`Ви впевнені що хочете видалити всі заяви?\nПісля видалення всі дані буде витерто без можливості відновлення!\nВсеодно видалити?`);
+            if(deleteOP){
+                 firebase.database().ref(`choose-app/${this.OP}`).child('declare').remove();
+                 this.getData();
+            }
+        },
+        DeleteOP(){
+            let deleteOP = confirm(`Ви впевнені що хочете видалити ОП - ${this.OP}?\nПісля видалення всі дані буде витерто без можливості відновлення!\nВсеодно видалити?`);
+            if(deleteOP){
+                 firebase.database().ref(`choose-app`).child(this.OP).remove();
+                 window.location.reload();
+            }
+        },
+        deleteDocument(name){
+            firebase.database().ref(`choose-app/${this.OP}/declare`).child(name).remove();
+            this.getData();
+        },
         deleteItem(id){
             firebase.database().ref(`choose-app/${this.OP}/disciplines`).child(id).remove();
             this.getData();
@@ -286,6 +387,11 @@ export default {
 };
 </script>
 <style scoped>
+.settings{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 .content{
   background: #f2f2f2d5;
   width: 60%;
@@ -322,7 +428,7 @@ svg{
     align-items: center;
     justify-content: space-between;
 }
-.tabs-container h4{
+.tabs-container h4,h6{
     margin:0!important;
     padding:10px;
     color:grey;
@@ -331,8 +437,20 @@ svg{
 .tabs-container h4.active{
     color:#7957d5;
 }
+.tabs-container h6.active{
+    color:#7957d5;
+}
 .tabs-container h4:hover{
     color:#7957d5;
+}
+.tabs-container h6:hover{
+    color:#7957d5;
+}
+.tabs-container h4:last-child:hover{
+    color:red
+}
+.tabs-container h6:last-child:hover{
+    color:red
 }
 @media screen and (max-width: 1024px) {
   .content {
