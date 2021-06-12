@@ -44,7 +44,7 @@
                               {{dis.title}}
                               </div>
                               <div>
-                                Деталі дисципліни <a :href="dis.link_to_file">тут  {{+j==1?index:+j+index}}</a>
+                                Деталі дисципліни <a :href="dis.link_to_file">тут</a>
                               </div>
                             </div>
                         </b-radio>
