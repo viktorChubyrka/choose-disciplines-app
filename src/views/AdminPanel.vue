@@ -12,7 +12,7 @@
               <div>
                 
                 <div class="input-row">
-                    <b-field style="width:90%" :label="`Повна назва дисципліни`">
+                    <b-field style="width:90%" :label="`Повна назва освітньої програми`">
                         <b-input  expanded v-model="full_OP_name"></b-input>
                     </b-field>
                      <svg @click="saveFullOPName()" style="width:40px;height:40px" viewBox="0 0 24 24">
