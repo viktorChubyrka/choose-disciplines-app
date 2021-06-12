@@ -131,6 +131,7 @@ export default {
         }
         })
       this.selected_OP = null;
+      this.stage = null;
     },
     dataSorted(){
             let newData={'2':[],'3':[],'4':[]};
