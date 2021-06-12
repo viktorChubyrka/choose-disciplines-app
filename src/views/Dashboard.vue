@@ -115,7 +115,7 @@ export default {
   methods:{
     saveChoise(){
       var starCountRef = firebase.database().ref(`choose-app/${this.selected_OP}/declare/${this.userData.data.email.split('.')[0]}/`);
-      starCountRef.on('value', (snapshot) => {
+      starCountRef.once('value', (snapshot) => {
         if (snapshot.exists()){
           alert('Ви вже відправили заяву!')
         }
@@ -156,7 +156,7 @@ export default {
         },
         getData(){
             var starCountRef = firebase.database().ref('choose-app/');
-            starCountRef.on('value', (snapshot) => {
+            starCountRef.once('value', (snapshot) => {
               console.log(snapshot.val());
                 this.all_data = snapshot.val();
             });

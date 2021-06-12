@@ -185,7 +185,7 @@ export default {
         this.OP = prompt('Номер освітньої програми:', );
         if(this.OP){
             var starCountRef = firebase.database().ref(`choose-app/${this.OP}/`);
-            starCountRef.on('value', (snapshot) => {
+            starCountRef.once('value', (snapshot) => {
                 if (snapshot.exists()){
                     let pass = prompt(`Пароль від адмін панелі освітньої програми ${this.OP}:`, );
                     if(pass===snapshot.val().password){
@@ -241,7 +241,7 @@ export default {
         },
         getData(){
             var starCountRef = firebase.database().ref(`choose-app/${this.OP}/`);
-            starCountRef.on('value', (snapshot) => {
+            starCountRef.once('value', (snapshot) => {
                 this.data = snapshot.val().disciplines;
                 this.faculty_name = snapshot.val().faculty_name;
                 this.dekan = snapshot.val().dekan;
