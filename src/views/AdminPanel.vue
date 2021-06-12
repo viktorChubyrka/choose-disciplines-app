@@ -196,7 +196,7 @@ export default {
                     }
                     
                 }else{
-                    let createNewOP = confirm(`Освітньої програми номер ${this.OP} не існує! \n Бажаєте творити її?`);
+                    let createNewOP = confirm(`Освітньої програми номер ${this.OP} не існує! \n Бажаєте створити її?`);
                     if(createNewOP){
                         let password = prompt(`Придумайте пароль від адмін панелі освітньої програми ${this.OP}:`, );
                         let database = firebase.database();
