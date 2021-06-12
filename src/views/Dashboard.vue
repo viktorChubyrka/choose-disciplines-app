@@ -127,11 +127,10 @@ export default {
                   user: this.userData.data.displayName,
                   stage:this.stage
                 }
-              )
+              ).then(()=>{this.selected_OP = null;this.stage = null;})
         }
         })
-      this.selected_OP = null;
-      this.stage = null;
+      
     },
     dataSorted(){
             let newData={'2':[],'3':[],'4':[]};
