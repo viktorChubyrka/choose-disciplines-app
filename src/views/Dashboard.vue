@@ -130,7 +130,7 @@ export default {
               )
         }
         })
-     
+      this.selected_OP = null;
     },
     dataSorted(){
             let newData={'2':[],'3':[],'4':[]};
