@@ -5,8 +5,8 @@
     <div class="main-container">
         <div v-if="are_admin" class="content">
             <div class="tabs-container">
-                    <h4 @click="tab=1" :class="tab==1?'active':''">Налаштування освітньої програми</h4>
-                    <h4 @click="tab=2" :class="tab==2?'active':''">Списки заповнених заяв</h4>
+                    <h4 @click="tab=1,getData()" :class="tab==1?'active':''">Налаштування освітньої програми</h4>
+                    <h4 @click="tab=2,getData()" :class="tab==2?'active':''">Списки заповнених заяв</h4>
                     <h4 @click="DeleteOP()">Видалити ОП</h4>
             </div>
             <div v-if="tab==1" >
@@ -125,7 +125,7 @@
                     </div>
                     <div style="display:flex">
                         <b-button style="width:min-content;margin-right:10px"
-                            @click="deleteDocument(key124)"
+                            @click="deleteDocument(el.id)"
                             type="is-danger"
                             rounded
                             expanded

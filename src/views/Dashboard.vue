@@ -31,12 +31,12 @@
           </b-select> -->
           <div v-if="stage" class="choose-container" >
             <h2>Виберіть дисципліни</h2>
-              <div class="cemester-container" v-for="(cemester_disciplines,j) in filteredDisciplines" :key="j">
-                <h2 style="margin-top:20px">{{j}} семестр</h2>
+              <div class="cemester-container" v-for="(cemester_disciplines,key,j) in filteredDisciplines" :key="key">
+                <h2 style="margin-top:20px">{{key}} семестр</h2>
                 <div v-for="(el,index) in cemester_disciplines" :key="el.id" class="discipline-choose-item">
                   <h3 style="margin-top:20px">Дисципліна на вибір {{index+1}}</h3>
                     <b-field v-for="(dis,i) in el.disciplines" :key="i">
-                        <b-radio v-model="array[+j==1?index:+j+index]"
+                        <b-radio v-model="array[+j+1==1?index:+j+1+index]"
                             size="is-large"
                             :native-value="dis.title">
                             <div class="radio-content">
