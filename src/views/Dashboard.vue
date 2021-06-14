@@ -56,7 +56,7 @@
                   type="is-primary"
                   rounded
                   expanded
-                  :disabled="!data || !stage || !areAllDisciplinesChoosen"
+                  :disabled="!data || !data[stage].length || !stage || !areAllDisciplinesChoosen"
                   >Підтвердити вибір
                 </b-button>
               
