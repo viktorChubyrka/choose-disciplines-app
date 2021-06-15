@@ -146,8 +146,18 @@
                 <div v-else>
                         <div v-for="(el,key) in disciplinesList" :key="key">
                             <h3>{{key}} Курс</h3>
-                            <div style="display:flex;align-items:center" v-for="element in el" :key="element.dis"><h4>{{element.dis}}:</h4>  <h5>вибрало - {{element.counter}}</h5></div>
+                            <div style="display:flex;align-items:center;justify-content:space-between" v-for="element in el" :key="element.dis"><h4>{{element.dis}}:</h4>  <h5 @click="pop_up=element" style="cursor:pointer;color:#7957d5">вибрало - {{element.counter}}</h5></div>
                         </div>
+                </div>
+                <div v-if="pop_up" class="pop-up">
+                    <svg @click="pop_up=null" style="width:30px;height:30px" viewBox="0 0 24 24">
+                        <path fill="white" d="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2M14.59,8L12,10.59L9.41,8L8,9.41L10.59,12L8,14.59L9.41,16L12,13.41L14.59,16L16,14.59L13.41,12L16,9.41L14.59,8Z" />
+                    </svg>
+                    <div class="container">
+                        Студенти які вибрали дисципліну:
+                        <h5>{{pop_up.dis}}</h5>
+                        <div class="students" v-for="el in pop_up.students" :key="el">{{el}}</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -173,6 +183,7 @@ export default {
             faculty_name:null,
             cemester:null,
             number:2,
+            pop_up:null,
             disciplines_for_add:[
                 {
                     title:'',
@@ -253,7 +264,14 @@ export default {
                         for (let i = 0; i < disc_obj[key].length; i++) {
                             if(el.dis==disc_obj[key][i])
                             {
+                                el.students = []
                                 el.counter+=1;
+                                for (let j = 0; j < this.sortedDeclares[key].length; j++) {
+                                    if(this.sortedDeclares[key][j].selected_disciplines.includes(el.dis)){
+                                        el.students.push(this.sortedDeclares[key][j].user)
+                                    }
+                                    
+                                }
                             }
                         }
                     });
@@ -451,6 +469,41 @@ svg{
 }
 .tabs-container h6:last-child:hover{
     color:red
+}
+.pop-up{
+    position: fixed;
+    top:0;
+    left:0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.658);
+    display: flex;
+    align-items: center;
+
+    flex-direction: column;
+}
+.pop-up .container{
+    height:100vh;
+    box-sizing: border-box;
+    padding:10vh 2vh;
+    overflow-y: scroll;
+    background-color: white;
+}
+.pop-up .container::-webkit-scrollbar{
+    width:0;
+}
+.container div{
+    color: #7957d5;
+    font-size: 20px;
+}
+.pop-up svg{
+    position: absolute;
+    right:20px;
+    top:20px;
+    z-index: 11;
+
 }
 @media screen and (max-width: 1024px) {
   .content {
